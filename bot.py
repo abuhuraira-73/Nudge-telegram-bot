@@ -67,11 +67,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message = (
         f"👋 Hello {user_data.first_name}!\n\n"
-        f"I'm **{Config.BOT_DISPLAY_NAME}**, your personal reminder assistant. 🔔\n\n"
-        "You can send me reminders in natural language like:\n"
-        "• 'remind me to call Mom at 5pm'\n"
-        "• 'remind me to submit report tomorrow 9am'\n\n"
-        "Use the menu below for quick actions!\n\n"
+        f"I'm **{Config.BOT_DISPLAY_NAME}**, your smart AI assistant. 🔔\n\n"
+        "🚀 **Getting Started:**\n"
+        "1️⃣ **Set Timezone:** Click '🌍 Set Timezone' so I know when it's 'tomorrow' for you.\n"
+        "2️⃣ **Sync Calendar:** Click '🗓️ Connect Calendar' to add reminders to your Google Calendar.\n\n"
+        "Once set up, just talk to me naturally:\n"
+        "• *'remind me to call Mom at 5pm'* \n"
+        "• *'buy groceries tomorrow morning'* \n\n"
         "🌐 **Visit my creator:** [abuhuraira.in](https://www.abuhuraira.in/)"
     )
     await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
