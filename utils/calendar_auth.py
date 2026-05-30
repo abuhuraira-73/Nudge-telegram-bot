@@ -1,6 +1,8 @@
 import os
 import json
 import logging
+import urllib.parse
+import requests
 from google_auth_oauthlib.flow import Flow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -10,26 +12,36 @@ from google.auth.transport.requests import Request
 SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 CREDENTIALS_FILE = 'credentials.json'
 
-def get_flow():
-    """
-    Creates a Flow object for the OAuth 2.0 process.
-    """
-    return Flow.from_client_secrets_file(
-        CREDENTIALS_FILE,
-        scopes=SCOPES,
-        redirect_uri='urn:ietf:wg:oauth:2.0:oob' # Standard for manual code exchange
-    )
+def get_client_config():
+    """Gets the client config from env or file."""
+    env_creds = os.getenv("GOOGLE_CREDENTIALS_JSON")
+    if env_creds:
+        try:
+            return json.loads(env_creds)['installed']
+        except Exception as e:
+            logging.error(f"Error parsing GOOGLE_CREDENTIALS_JSON: {e}")
+            return None
+    
+    if os.path.exists(CREDENTIALS_FILE):
+        try:
+            with open(CREDENTIALS_FILE, 'r') as f:
+                return json.load(f)['installed']
+        except Exception as e:
+            logging.error(f"Error reading credentials.json: {e}")
+            return None
+    
+    return None
 
 def get_auth_url():
     """
     Generates the Google authorization URL manually.
     Uses http://localhost as the redirect_uri.
     """
-    with open(CREDENTIALS_FILE, 'r') as f:
-        config = json.load(f)
-    client_config = config['installed']
+    client_config = get_client_config()
+    if not client_config:
+        logging.error("Google Client Config not found!")
+        return None
     
-    import urllib.parse
     params = {
         'client_id': client_config['client_id'],
         'redirect_uri': 'http://localhost',
@@ -45,11 +57,9 @@ def exchange_code(auth_code):
     Exchanges an authorization code for a token.
     Uses http://localhost as the redirect_uri.
     """
-    import requests
-    
-    with open(CREDENTIALS_FILE, 'r') as f:
-        config = json.load(f)
-    client_config = config['installed']
+    client_config = get_client_config()
+    if not client_config:
+        raise Exception("Google Credentials not configured.")
     
     token_url = "https://oauth2.googleapis.com/token"
     data = {
@@ -90,9 +100,6 @@ def get_calendar_service(token_json):
         if creds and creds.expired and creds.refresh_token:
             logging.info("Refreshing Google Calendar access token...")
             creds.refresh(Request())
-            # Note: We should ideally save the refreshed token back to the DB here,
-            # but for simplicity, we'll return the service and let the caller handle it if needed.
-            # In our case, the service object will work.
             
         return build('calendar', 'v3', credentials=creds)
     except Exception as e:

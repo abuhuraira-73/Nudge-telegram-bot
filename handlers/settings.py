@@ -111,9 +111,11 @@ async def connect_calendar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Sends the Google authorization URL to the user.
     """
     import os
-    if not os.path.exists('credentials.json'):
+    has_creds = os.path.exists('credentials.json') or os.getenv("GOOGLE_CREDENTIALS_JSON")
+    
+    if not has_creds:
         await update.message.reply_text(
-            "❌ Google Calendar integration is not configured on the server (missing credentials.json)."
+            "❌ Google Calendar integration is not configured on the server."
         )
         return
 
