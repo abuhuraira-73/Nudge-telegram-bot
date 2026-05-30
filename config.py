@@ -18,6 +18,10 @@ class Config:
     # Gemini AI
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
+    # Web Settings for OAuth Callback
+    WEB_URL = os.getenv("WEB_URL") # e.g. https://nudge-production.up.railway.app
+    PORT = int(os.getenv("PORT", 8080))
+
     # Check if token exists
     if not TELEGRAM_BOT_TOKEN:
         raise ValueError("No TELEGRAM_BOT_TOKEN found in environment. Please check your .env file.")

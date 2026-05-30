@@ -32,10 +32,15 @@ def get_client_config():
     
     return None
 
+def get_redirect_uri():
+    """Returns the redirect URI for OAuth."""
+    if Config.WEB_URL:
+        return f"{Config.WEB_URL.rstrip('/')}/callback"
+    return "http://localhost"
+
 def get_auth_url():
     """
     Generates the Google authorization URL manually.
-    Uses http://localhost as the redirect_uri.
     """
     client_config = get_client_config()
     if not client_config:
@@ -44,7 +49,7 @@ def get_auth_url():
     
     params = {
         'client_id': client_config['client_id'],
-        'redirect_uri': 'http://localhost',
+        'redirect_uri': get_redirect_uri(),
         'response_type': 'code',
         'scope': ' '.join(SCOPES),
         'access_type': 'offline',
@@ -55,7 +60,6 @@ def get_auth_url():
 def exchange_code(auth_code):
     """
     Exchanges an authorization code for a token.
-    Uses http://localhost as the redirect_uri.
     """
     client_config = get_client_config()
     if not client_config:
@@ -66,7 +70,7 @@ def exchange_code(auth_code):
         'code': auth_code,
         'client_id': client_config['client_id'],
         'client_secret': client_config['client_secret'],
-        'redirect_uri': 'http://localhost',
+        'redirect_uri': get_redirect_uri(),
         'grant_type': 'authorization_code'
     }
     

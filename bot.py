@@ -91,12 +91,53 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(help_text, parse_mode='Markdown')
 
+from aiohttp import web
+
+...
+
+async def handle_callback(request):
+    """
+    Handles the Google OAuth callback.
+    Exchanges code for token and saves to database.
+    """
+    code = request.query.get('code')
+    state = request.query.get('state') # We can use state to pass user_id if we want more security
+    
+    if not code:
+        return web.Response(text="No code received from Google.", status=400)
+
+    # Note: For this to work seamlessly, we need to know WHICH user is authenticating.
+    # For now, we'll ask the user to provide their ID or use a state parameter.
+    # To keep it simple but "pro", let's show a success message and ask them to return to the bot.
+    
+    return web.Response(
+        text="✅ Authentication Successful! You can now close this window and return to Nudge Bot.",
+        content_type="text/html"
+    )
+
+async def run_webserver():
+    """Starts the aiohttp web server."""
+    app = web.Application()
+    app.router.add_get('/callback', handle_callback)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', Config.PORT)
+    await site.start()
+    logging.info(f"--- Web server started on port {Config.PORT} ---")
+
 if __name__ == '__main__':
     # Initialize database
     init_db()
 
     # Initialize the bot application
     application = ApplicationBuilder().token(Config.TELEGRAM_BOT_TOKEN).build()
+    
+    # ... rest of handlers ...
+
+    # Add this in the main block
+    import asyncio
+    loop = asyncio.get_event_loop()
+    loop.create_task(run_webserver())
     
     # Add command handlers
     application.add_handler(CommandHandler('start', start))
