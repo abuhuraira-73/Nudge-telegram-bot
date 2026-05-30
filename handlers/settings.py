@@ -111,11 +111,15 @@ async def connect_calendar(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Sends the Google authorization URL to the user.
     """
     import os
-    has_creds = os.path.exists('credentials.json') or os.getenv("GOOGLE_CREDENTIALS_JSON")
+    env_creds = os.getenv("GOOGLE_CREDENTIALS_JSON")
+    has_file = os.path.exists('credentials.json')
     
-    if not has_creds:
+    if not has_file and not env_creds:
+        logging.error("Calendar config failure: No credentials.json and GOOGLE_CREDENTIALS_JSON is empty.")
         await update.message.reply_text(
-            "❌ Google Calendar integration is not configured on the server."
+            "❌ Google Calendar integration is not configured.\n\n"
+            "**Developer Note:** Ensure `GOOGLE_CREDENTIALS_JSON` is added to your Railway variables and deployed.",
+            parse_mode='Markdown'
         )
         return
 
