@@ -10,7 +10,12 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./nudge_bot.db")
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-engine = create_engine(DATABASE_URL)
+# Add SSL requirements for Cloud Databases (Postgres)
+if "postgresql" in DATABASE_URL:
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+else:
+    engine = create_engine(DATABASE_URL)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
