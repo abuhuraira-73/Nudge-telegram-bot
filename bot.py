@@ -71,7 +71,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "You can send me reminders in natural language like:\n"
         "• 'remind me to call Mom at 5pm'\n"
         "• 'remind me to submit report tomorrow 9am'\n\n"
-        "Use the menu below for quick actions!"
+        "Use the menu below for quick actions!\n\n"
+        "🌐 **Visit my creator:** [abuhuraira.in](https://www.abuhuraira.in/)"
     )
     await update.message.reply_text(message, parse_mode='Markdown', reply_markup=reply_markup)
 
