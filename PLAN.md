@@ -19,7 +19,7 @@ Nudge Bot is a smart personal assistant on Telegram designed to handle natural l
 ### 3. Notification Channels
 - **Telegram**: Direct message with interactive "Done" and "Multi-option Snooze" buttons.
 - **Email**: SMTP integration ready (Requires Gmail App Password).
-- **Google Calendar**: Full OAuth 2.0 integration. Reminders are automatically created as events.
+- **Google Calendar**: Full OAuth 2.0 integration with an automated "Smooth Redirect" callback server. Reminders are automatically created as events.
 
 ### 4. UI & UX (The "Pro" Feel)
 - **Persistent Menu**: Bottom-docked Reply Keyboard for one-click access to all features.

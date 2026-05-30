@@ -20,9 +20,10 @@
 
 *   **🧠 AI-Powered Brain:** Uses Google Gemini 1.5 Flash to parse messy natural language into structured data. It understands corrections, priorities, and ambiguous times like "tonight" or "in the evening."
 *   **🌍 Smart Timezones:** Automatically handles IANA timezone conversions. Confirms reminders in your local time while storing them in UTC for absolute accuracy.
-*   **🗓️ Google Calendar Sync:** Seamlessly creates events in your primary Google Calendar as soon as a reminder is set.
+*   **🗓️ Google Calendar Sync:** Seamlessly creates events in your primary Google Calendar. Features an automated "Smooth Flow" OAuth 2.0 handshake—no manual code copying required.
 *   **📧 Email Alerts:** Optional SMTP integration to receive reminder backups in your inbox.
 *   **🎨 Rich UI Experience:** 
+    *   **Onboarding Checklist:** A 1-2-3 guide for new users to set up timezones and sync calendars instantly.
     *   **Summary Cards:** Beautifully formatted confirmation messages with emojis.
     *   **Persistent Menu:** Bottom-docked buttons for quick navigation.
     *   **Dynamic Snooze:** Inline options to snooze for 5m, 30m, 1h, or "Tomorrow."
