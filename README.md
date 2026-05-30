@@ -35,14 +35,14 @@
 *   **👤 User Timezone Management:** `/timezone` command with IANA validation.
 *   **🤖 Advanced AI Parser:** Fully integrated "Super Prompt" for Gemini that handles priority and relative calculations.
 *   **⌨️ Interactive UI:** Custom Reply Keyboards and Inline buttons for a "mobile app" feel.
-*   **💾 Database Persistence:** SQLAlchemy integration currently running on SQLite, ready for PostgreSQL.
+*   **💾 Database Persistence:** Full PostgreSQL integration with SSL support for cloud stability.
 *   **🗓️ OAuth 2.0 Calendar Flow:** Secure connection to Google Calendar.
-*   **🔔 Reliable Notifications:** Background scheduler with timezone-aware logic.
+*   **🔔 Reliable Notifications:** Background scheduler with timezone-aware logic and 30s precision.
+*   **☁️ Cloud Deployment:** Production-ready deployment on Railway.app with persistent storage.
 
 ### 🚧 Currently Working On
 
 *   **🔄 Recurring Reminders:** Adding logic to automatically reschedule tasks marked as "daily," "weekly," or "weekdays" once they are completed.
-*   **☁️ Cloud Deployment:** Finalizing the transition to PostgreSQL and auto-deployment via Railway.app.
 
 ### 🚀 Upcoming Features
 
