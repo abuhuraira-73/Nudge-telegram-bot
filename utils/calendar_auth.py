@@ -8,6 +8,8 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 
+from config import Config
+
 # Scopes required for Google Calendar API
 SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 CREDENTIALS_FILE = 'credentials.json'
@@ -15,20 +17,23 @@ CREDENTIALS_FILE = 'credentials.json'
 def get_client_config():
     """Gets the client config from env or file."""
     env_creds = os.getenv("GOOGLE_CREDENTIALS_JSON")
+    data = None
     if env_creds:
         try:
-            return json.loads(env_creds)['installed']
+            data = json.loads(env_creds)
         except Exception as e:
             logging.error(f"Error parsing GOOGLE_CREDENTIALS_JSON: {e}")
-            return None
     
-    if os.path.exists(CREDENTIALS_FILE):
+    elif os.path.exists(CREDENTIALS_FILE):
         try:
             with open(CREDENTIALS_FILE, 'r') as f:
-                return json.load(f)['installed']
+                data = json.load(f)
         except Exception as e:
             logging.error(f"Error reading credentials.json: {e}")
-            return None
+
+    if data:
+        # Support both 'web' (Cloud) and 'installed' (Desktop) types
+        return data.get('web') or data.get('installed')
     
     return None
 
@@ -38,7 +43,7 @@ def get_redirect_uri():
         return f"{Config.WEB_URL.rstrip('/')}/callback"
     return "http://localhost"
 
-def get_auth_url():
+def get_auth_url(user_id: int):
     """
     Generates the Google authorization URL manually.
     """
@@ -53,7 +58,8 @@ def get_auth_url():
         'response_type': 'code',
         'scope': ' '.join(SCOPES),
         'access_type': 'offline',
-        'prompt': 'consent'
+        'prompt': 'consent',
+        'state': str(user_id) # Pass user_id to the callback
     }
     return f"{client_config['auth_uri']}?{urllib.parse.urlencode(params)}"
 

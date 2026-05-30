@@ -123,17 +123,34 @@ async def connect_calendar(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    from utils.calendar_auth import get_auth_url
-    auth_url = get_auth_url()
+    from utils.calendar_auth import get_auth_url, get_redirect_uri
+    auth_url = get_auth_url(update.effective_user.id)
     
-    message = (
-        "🔗 **Connect Google Calendar**\n\n"
-        "To sync your reminders with Google Calendar, please follow these steps:\n"
-        f"1. [Click here to sign in with Google]({auth_url})\n"
-        "2. After signing in, your browser will try to go to `localhost` and show an error (e.g., 'Site can't be reached'). **This is normal!**\n"
-        "3. **Look at the URL bar** of that error page. It will look like: `http://localhost/?code=4/0Af...` \n"
-        "4. **Copy the code** (everything after `code=`) and send it back using: `/auth YOUR_CODE_HERE`"
-    )
+    if not auth_url:
+        await update.message.reply_text("❌ Failed to generate connection link. Please check your credentials.")
+        return
+
+    from config import Config
+    if Config.WEB_URL:
+        # Pro / Automated Flow
+        message = (
+            "🔗 **Connect Google Calendar**\n\n"
+            "To sync your reminders, please follow these steps:\n"
+            f"1. [Click here to sign in with Google]({auth_url})\n"
+            "2. After authorizing, you will be automatically redirected back.\n"
+            "3. Once you see the 'Success' page, your calendar is linked! 🚀"
+        )
+    else:
+        # Legacy / Manual Flow
+        message = (
+            "🔗 **Connect Google Calendar**\n\n"
+            "To sync your reminders, please follow these steps:\n"
+            f"1. [Click here to sign in with Google]({auth_url})\n"
+            "2. After signing in, your browser will try to go to `localhost` and show an error. **This is normal!**\n"
+            "3. **Look at the URL bar** of that error page and copy the code after `code=`.\n"
+            "4. Send it back using: `/auth YOUR_CODE_HERE`"
+        )
+    
     await update.message.reply_text(message, parse_mode='Markdown')
 
 async def auth_calendar(update: Update, context: ContextTypes.DEFAULT_TYPE):

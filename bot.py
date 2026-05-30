@@ -98,22 +98,44 @@ from aiohttp import web
 async def handle_callback(request):
     """
     Handles the Google OAuth callback.
-    Exchanges code for token and saves to database.
+    Exchanges code for token and saves to database for the specific user.
     """
     code = request.query.get('code')
-    state = request.query.get('state') # We can use state to pass user_id if we want more security
+    user_id = request.query.get('state') # We passed this as 'state'
     
-    if not code:
-        return web.Response(text="No code received from Google.", status=400)
+    if not code or not user_id:
+        return web.Response(text="❌ Invalid callback parameters.", status=400)
 
-    # Note: For this to work seamlessly, we need to know WHICH user is authenticating.
-    # For now, we'll ask the user to provide their ID or use a state parameter.
-    # To keep it simple but "pro", let's show a success message and ask them to return to the bot.
-    
-    return web.Response(
-        text="✅ Authentication Successful! You can now close this window and return to Nudge Bot.",
-        content_type="text/html"
-    )
+    try:
+        # Exchange code for token
+        from utils.calendar_auth import exchange_code
+        token_json = exchange_code(code)
+        
+        # Save to database
+        session = SessionLocal()
+        user = session.query(User).filter(User.user_id == int(user_id)).first()
+        if user:
+            user.calendar_token = token_json
+            session.commit()
+            session.close()
+            logging.info(f"--- Automated Calendar Link Success for user {user_id} ---")
+            
+            # Show Success HTML
+            html = """
+            <div style="font-family: sans-serif; text-align: center; margin-top: 100px;">
+                <h1 style="color: #4CAF50;">✅ Authentication Successful!</h1>
+                <p>Your Google Calendar is now connected to Nudge Bot.</p>
+                <p>You can close this window and return to Telegram.</p>
+            </div>
+            """
+            return web.Response(text=html, content_type="text/html")
+        else:
+            session.close()
+            return web.Response(text="User not found in database.", status=404)
+
+    except Exception as e:
+        logging.error(f"Callback error: {e}")
+        return web.Response(text=f"Authentication failed: {str(e)}", status=500)
 
 async def run_webserver():
     """Starts the aiohttp web server."""
